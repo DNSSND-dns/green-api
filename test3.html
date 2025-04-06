@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!-- я так понял через это мне поступит сообщение 77053211392 номер ватса -->
+<html lang="ru"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GREEN-API Integration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #response {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      white-space: pre-wrap;
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body style="
+    display: flex;
+    flex-direction: row;
+">
+  <div class="container">
+    
+
+    <input type="text" id="idInstance" placeholder="ID Instance">
+    <input type="text" id="ApiTokenInstance" placeholder="API Token Instance">
+    
+    <button onclick="getSettings()">Получить настройки (getSettings)</button>
+    <button onclick="getStateInstance()">Получить состояние инстанса (getStateInstance)</button>
+
+    <input type="text" id="chatId" placeholder="Номер телефона или ID группы для сообщений">
+    <input type="text" id="messageText" placeholder="Текст сообщения">
+    <button onclick="sendMessage()">Отправить сообщение (sendMessage)</button>
+
+    <input type="text" id="fileChatId" placeholder="Номер телефона или ID группы для файла">
+    <input type="text" id="fileUrl" placeholder="URL файла для отправки">
+    <button onclick="sendFileByUrl()">Отправить файл по URL (sendFileByUrl)</button>
+
+    
+  </div>
+
+  <script>
+    const apiUrl = "https://api.green-api.com/waInstance";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const handleChatId = (input) => {
+        input.addEventListener("blur", () => {
+          let value = input.value.trim();
+          if (value.endsWith("@c.us") || value.endsWith("@g.us")) return;
+          input.value = /^\d+$/.test(value) ? value + "@c.us" : value + "@g.us";
+        });
+      };
+      handleChatId(document.getElementById("chatId"));
+      handleChatId(document.getElementById("fileChatId"));
+    });
+
+    async function getSettings() {
+      const idInstance = document.getElementById("idInstance").value;
+      const apiTokenInstance = document.getElementById("ApiTokenInstance").value;
+      const response = await fetch(`${apiUrl}${idInstance}/getSettings/${apiTokenInstance}`);
+      const data = await response.json();
+      document.getElementById("response").textContent = `Ответ:\n${JSON.stringify(data, null, 2)}`;
+    }
+
+    async function getStateInstance() {
+      const idInstance = document.getElementById("idInstance").value;
+      const apiTokenInstance = document.getElementById("ApiTokenInstance").value;
+      const response = await fetch(`${apiUrl}${idInstance}/getStateInstance/${apiTokenInstance}`);
+      const data = await response.json();
+      document.getElementById("response").textContent = `Ответ:\n${JSON.stringify(data, null, 2)}`;
+    }
+
+    async function sendMessage() {
+      const idInstance = document.getElementById("idInstance").value;
+      const apiTokenInstance = document.getElementById("ApiTokenInstance").value;
+      const chatId = document.getElementById("chatId").value;
+      const message = document.getElementById("messageText").value;
+      const payload = { chatId, message };
+      const response = await fetch(`${apiUrl}${idInstance}/sendMessage/${apiTokenInstance}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      document.getElementById("response").textContent = `Ответ:\n${JSON.stringify(data, null, 2)}`;
+    }
+
+    async function sendFileByUrl() {
+      const idInstance = document.getElementById("idInstance").value;
+      const apiTokenInstance = document.getElementById("ApiTokenInstance").value;
+      const chatId = document.getElementById("fileChatId").value;
+      const fileUrl = document.getElementById("fileUrl").value;
+      const payload = {
+        chatId,
+        urlFile: fileUrl,
+        fileName: "file"
+      };
+      const response = await fetch(`${apiUrl}${idInstance}/sendFileByUrl/${apiTokenInstance}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await response.json();
+      document.getElementById("response").textContent = `Ответ:\n${JSON.stringify(data, null, 2)}`;
+    }
+  </script>
+<div class="container2" <div="" id="response" style="
+    width: 30%;
+"></div>
+
+</body></html>
